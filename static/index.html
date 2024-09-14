@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" style="width: calc(100vw); height: calc(100vh); margin: 0px; background: cornflowerblue">
+  <head>
+    <meta charset="UTF-8">
+    <title>JokeBot</title>
+    <script>
+      let setup = "";
+      let punchline = "";
+      const up = new SpeechSynthesisUtterance();
+      const punch = new SpeechSynthesisUtterance();
+
+      function tellJoke() {
+        if (!speechSynthesis.speaking) {
+          fetch('/joke').then(response => response.text()).then(text => {
+            JSON.parse((text), (key, value) => {
+              if (key.valueOf() == "setup") {
+                document.getElementById('Joke').innerText = value.toString();
+                setup = value;
+                up.text = value.toString();
+                document.getElementById('Joke').style.display = 'block';
+                up.onend = function () {
+                  setTimeout(function () {
+                    line();
+                  }, 1500);
+                }
+                speechSynthesis.speak(up);
+
+              }
+              if (key.valueOf() == "punchline") {
+                punchline = value;
+              }
+            })
+          })
+        }
+      }
+
+      function line() {
+        if (setup.toString() !== "") {
+          punch.text = punchline.toString();
+          document.getElementById('Joke').innerText = punchline.toString();
+          speechSynthesis.speak(punch);
+        }
+      }
+    </script>
+  </head>
+  <body style="margin: 0px;" id="main">
+    <div style="display: flex; flex-direction: column; align-content: center; justify-content: center; height: 100vh; width: 100vw;">
+      <h1 style="margin: 0px; text-align: center">Welcome to my Joke Bot</h1>
+      <div style="" class="JokeContainer">
+        <img src="https://img.freepik.com/free-photo/view-graphic-3d-robot_23-2150849173.jpg" alt="image of bot" style="margin: 0.75em auto;" width="300" height="300"/>
+        <h1 style="font-size: 18px; background: white; padding: 8px 12px; display: none" id="Joke" class="Joke" onclick="line()"></h1>
+      </div>
+      <button id="button" style="width: min(300px, 50vw); padding: 8px 12px; border-radius: 8px; margin: 4px auto;"
+              onclick="tellJoke()" onkeydown="">Tell me a Joke</button>
+    </div>
+  </body>
+  <style>
+    @media (max-width: 799px) {
+      .Joke {
+        width: 300px;
+        margin: 8px auto;
+        display: flex;
+        text-align: center;
+        align-content: center;
+        justify-content: center;
+      }
+      .JokeContainer {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    @media (min-width: 800px) {
+      .JokeContainer {
+        display: inline-flex;
+        justify-content: center;
+      }
+      .Joke {
+        position: absolute;
+        left: calc(50vw + 160px);
+        margin-right: 1.25em;
+        display: flex;
+        text-align: center;
+        align-content: center;
+        justify-content: center;
+      }
+    }
+  </style>
+</html>
